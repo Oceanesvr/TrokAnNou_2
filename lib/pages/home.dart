@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:trokannou/pages/signup.dart';
 import 'connect.dart';
 
 class HomePage extends StatelessWidget {
@@ -9,10 +10,10 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Color(0xFFDDA15E),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: ListView(
+        //crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Padding(padding: EdgeInsets.only(top: 110, right: 10, left: 10)),
+          Padding(padding: EdgeInsets.only(top: 110, right: 10, left: 10)),
           Text('Nou kontan vwè-w asi',
               style: GoogleFonts.inter(
                 fontSize: 20,
@@ -39,9 +40,12 @@ class HomePage extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                           minimumSize: Size(320, 50),
                           backgroundColor: Color(0xFFBC6C25)),
-                      onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => ConnectPage())
-                      ),
-                      
+                      //lien vers la page de connexion
+                      onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ConnectPage())),
+
                       child: Text(
                         "Kontinyé",
                         style: TextStyle(
@@ -84,19 +88,26 @@ class HomePage extends StatelessWidget {
                       height: 20,
                     ),
                     Text(
-                      "Avez-vous déjà un compte ?",
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w100,
-                          color: Colors.white),
-                    ),
-                    Text(
-                      "Connectez-vous",
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
-                    ),
+              "Vous n'avez pas de compte ?",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w100,
+                color: Colors.white,
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/signup.dart'); 
+              },
+              child: Text(
+                "Inscrivez-vous",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
                   ],
                 ),
               ),

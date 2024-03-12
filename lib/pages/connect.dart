@@ -1,140 +1,184 @@
 import 'package:flutter/material.dart';
+import '/JSON/usager.dart';
+import 'services.dart';
+import 'signup.dart';
+import '../SQLite/database_helper.dart';
 
-class ConnectPage extends StatelessWidget {
+class ConnectPage extends StatefulWidget {
+  const ConnectPage({Key? key}) : super(key: key);
+
+  @override
+  State<ConnectPage> createState() => _ConnectPageState();
+}
+
+class _ConnectPageState extends State<ConnectPage> {
+  final userController = TextEditingController();
+  final mdpController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  bool isChecked = false;
+
+  final db = DatabaseHelper();
+
+  void login() async {
+    Usagers? usrDetails = await db.getUser(userController.text);
+    var res = await db.authenticate(userController.text, mdpController.text);
+    if (res) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ServicesPage()));
+    } else {
+      // Show error message
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Erreur de connexion'),
+            content: Text('Nom d\'utilisateur ou mot de passe incorrect.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Connexion'),
+        title: Text(''),
       ),
-      body: Stack(
-        children: [
-          Column(
+      body: Form(
+        key: _formKey,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+          child: ListView(
+            //crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        TextField(
-                          decoration: InputDecoration(
-                            labelText: 'E-mail',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        TextField(
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            labelText: 'Mot de passe',
-                            filled: true,
-                            fillColor: Colors.white,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                              borderSide: BorderSide.none,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        TextButton(
-                          onPressed: () {
-                            // MDP REIN
-                          },
-                          child: Text('Mot de passe oublié ?'),
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            // A CONNECTER A LA BDD
-                          },
-                          child: Text('Se connecter'),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Vous n\'avez pas de compte ?',
-                          textAlign: TextAlign.center,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // VERS LA PAGE INSCRIPTION
-                          },
-                          child: Text('Inscrivez-vous'),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Ou connectez-vous avec :',
-                          textAlign: TextAlign.center,
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                // VERS GOOGLE
-                              },
-                              icon: Icon(Icons.search), // VERS ??????
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                // VERS APPLE
-                              },
-                              icon: Icon(Icons.apple),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                //VERS FB
-                              },
-                              icon: Icon(Icons.facebook),
-                            ),
-                          ],
-                        ),
-                      ],
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: TextFormField(
+                  controller: userController,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50),
+                      borderSide: BorderSide.none,
+                    ),
+                    labelText: "Nom utilisateur",
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Entrez votre nom utilisateur';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: TextFormField(
+                  controller: mdpController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(50),
+                      borderSide: BorderSide.none,
+                    ),
+                    labelText: "Mot de passe",
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Entrez votre mot de passe';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(320, 50),
+                    backgroundColor: Color(0xFFBC6C25),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      login();
+                    }
+                  },
+                  child: Text(
+                    'Se connecter',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
                   ),
                 ),
               ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 100, vertical: 5),
+                    margin: const EdgeInsets.symmetric(vertical: 0),
+                    height: 80,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: <Widget>[
+                        Container(
+                          child: Image(image: AssetImage('images/iconGoogle.png')),
+                        ),
+                        Container(
+                          child: Image(image: AssetImage('images/iconApple.png')),
+                        ),
+                        Container(
+                          child: Image(image: AssetImage('images/iconFacebook.png')),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage()));
+                    },
+                    child: Column(
+                      children: [
+                        SizedBox(height: 20),
+                        Text(
+                          "Vous n'avez pas de compte ?",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w100,
+                            color: Color(0xFFDDA15E),
+                          ),
+                        ),
+                        Text(
+                          "Inscrivez-vous",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFDDA15E),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-          Positioned.fill(
-            bottom: 0,
-            child: CustomPaint(
-              size: Size.infinite,
-              painter: WavePainter(),
-            ),
-          ),
-        ],
+        ),
       ),
     );
-  }
-}
-
-class WavePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    var paint = Paint()
-      ..color = Color.fromARGB(255, 243, 244, 246)
-      ..style = PaintingStyle.fill;
-
-    var path = Path();
-    path.moveTo(0, size.height * 0.75);
-    path.quadraticBezierTo(size.width * 0.25, size.height * 0.70, size.width * 0.50, size.height * 0.75);
-    path.quadraticBezierTo(size.width * 0.75, size.height * 0.80, size.width, size.height * 0.75);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }
